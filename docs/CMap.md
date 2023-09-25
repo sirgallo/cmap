@@ -306,7 +306,7 @@ Pseudo-code:
 
 ## Sources
 
-[LockFreeMap](../pkg/map/CMap.go)
+[CMap](../CMap.go)
 
 
 ## Refs
