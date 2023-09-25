@@ -39,7 +39,8 @@ func main() {
 }
 ```
 
-to test:
+## Tests
+
 ```bash
 go test -v ./tests
 ```
