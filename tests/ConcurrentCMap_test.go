@@ -17,7 +17,7 @@ type KeyVal struct {
 //=================================== 32 bit
 
 func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
-	lfMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[string, uint32]()
 
 	inputSize := 100000
 	keyValPairs := make([]KeyVal, inputSize)
@@ -37,7 +37,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 
-			lfMap.Insert(val.Key, val.Value)
+			cMap.Insert(val.Key, val.Value)
 		}(val)
 	}
 
@@ -51,7 +51,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := lfMap.Retrieve(val.Key)
+			value := cMap.Retrieve(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
@@ -65,7 +65,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 }
 
 func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
-	lfMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[string, uint32]()
 
 	inputSize := 10000000
 
@@ -102,7 +102,7 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 			
-			lfMap.Insert(val.Key, val.Value)
+			cMap.Insert(val.Key, val.Value)
 		}(val)
 	}
 
@@ -116,7 +116,7 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := lfMap.Retrieve(val.Key)
+			value := cMap.Retrieve(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
