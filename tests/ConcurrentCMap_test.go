@@ -37,7 +37,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 
-			cMap.Insert(val.Key, val.Value)
+			cMap.Put(val.Key, val.Value)
 		}(val)
 	}
 
@@ -51,7 +51,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := cMap.Retrieve(val.Key)
+			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
@@ -102,7 +102,7 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 			
-			cMap.Insert(val.Key, val.Value)
+			cMap.Put(val.Key, val.Value)
 		}(val)
 	}
 
@@ -116,7 +116,7 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := cMap.Retrieve(val.Key)
+			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
@@ -153,7 +153,7 @@ func TestMapRandomSmallConcurrentOperations64(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 
-			cMap.Insert(val.Key, val.Value)
+			cMap.Put(val.Key, val.Value)
 		}(val)
 	}
 
@@ -167,7 +167,7 @@ func TestMapRandomSmallConcurrentOperations64(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := cMap.Retrieve(val.Key)
+			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
@@ -218,7 +218,7 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 			
-			cMap.Insert(val.Key, val.Value)
+			cMap.Put(val.Key, val.Value)
 		}(val)
 	}
 
@@ -232,7 +232,7 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 		go func (val KeyVal) {
 			defer retrieveWG.Done()
 
-			value := cMap.Retrieve(val.Key)
+			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
 			if value != val.Value {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)

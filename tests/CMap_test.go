@@ -11,24 +11,24 @@ import "github.com/sirgallo/cmap"
 func TestMapOperations32(t *testing.T) {
 	cMap := cmap.NewCMap[string, uint32]()
 
-	cMap.Insert("hello", "world")
-	cMap.Insert("new", "wow!")
-	cMap.Insert("again", "test!")
-	cMap.Insert("woah", "random entry")
-	cMap.Insert("key", "Saturday!")
-	cMap.Insert("sup", "6")
-	cMap.Insert("final", "the!")
-	cMap.Insert("6", "wow!")
-	cMap.Insert("asdfasdf", "add 10")
-	cMap.Insert("asdfasdf", "123123") // note same key, will update value
-	cMap.Insert("asd", "queue!")
-	cMap.Insert("fasdf", "interesting")
-	cMap.Insert("yup", "random again!")
-	cMap.Insert("asdf", "hello")
-	cMap.Insert("asdffasd", "uh oh!")
-	cMap.Insert("fasdfasdfasdfasdf", "error message")
-	cMap.Insert("fasdfasdf", "info!")
-	cMap.Insert("woah", "done")
+	cMap.Put("hello", "world")
+	cMap.Put("new", "wow!")
+	cMap.Put("again", "test!")
+	cMap.Put("woah", "random entry")
+	cMap.Put("key", "Saturday!")
+	cMap.Put("sup", "6")
+	cMap.Put("final", "the!")
+	cMap.Put("6", "wow!")
+	cMap.Put("asdfasdf", "add 10")
+	cMap.Put("asdfasdf", "123123") // note same key, will update value
+	cMap.Put("asd", "queue!")
+	cMap.Put("fasdf", "interesting")
+	cMap.Put("yup", "random again!")
+	cMap.Put("asdf", "hello")
+	cMap.Put("asdffasd", "uh oh!")
+	cMap.Put("fasdfasdfasdfasdf", "error message")
+	cMap.Put("fasdfasdf", "info!")
+	cMap.Put("woah", "done")
 
 	rootBitMap := (*cmap.CMapNode[string, uint32])(atomic.LoadPointer(&cMap.Root)).BitMap
 
@@ -44,28 +44,28 @@ func TestMapOperations32(t *testing.T) {
 
 	t.Log("retrieve values")
 
-	val1 := cMap.Retrieve("hello")
+	val1 := cMap.Get("hello")
 	expVal1 :=  "world"
 	t.Logf("actual: %s, expected: %s", val1, expVal1)
 	if val1 != expVal1 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val1, expVal1)
 	}
 
-	val2 := cMap.Retrieve("new")
+	val2 := cMap.Get("new")
 	expVal2 :=  "wow!"
 	t.Logf("actual: %s, expected: %s", val2, expVal2)
 	if val2 != expVal2 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val2, expVal2)
 	}
 
-	val3 := cMap.Retrieve("asdf")
+	val3 := cMap.Get("asdf")
 	expVal3 := "hello"
 	t.Logf("actual: %s, expected: %s", val3, expVal3)
 	if val3 != expVal3 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val3, expVal3)
 	}
 
-	val4 := cMap.Retrieve("asdfasdf")
+	val4 := cMap.Get("asdfasdf")
 	expVal4 := "123123"
 	t.Logf("actual: %s, expected: %s", val4, expVal4)
 	if val4 != expVal4 {
@@ -99,24 +99,24 @@ func TestMapOperations32(t *testing.T) {
 func TestMapOperations64(t *testing.T) {
 	cMap := cmap.NewCMap[string, uint64]()
 
-	cMap.Insert("hello", "world")
-	cMap.Insert("new", "wow!")
-	cMap.Insert("again", "test!")
-	cMap.Insert("woah", "random entry")
-	cMap.Insert("key", "Saturday!")
-	cMap.Insert("sup", "6")
-	cMap.Insert("final", "the!")
-	cMap.Insert("6", "wow!")
-	cMap.Insert("asdfasdf", "add 10")
-	cMap.Insert("asdfasdf", "123123") // note same key, will update value
-	cMap.Insert("asd", "queue!")
-	cMap.Insert("fasdf", "interesting")
-	cMap.Insert("yup", "random again!")
-	cMap.Insert("asdf", "hello")
-	cMap.Insert("asdffasd", "uh oh!")
-	cMap.Insert("fasdfasdfasdfasdf", "error message")
-	cMap.Insert("fasdfasdf", "info!")
-	cMap.Insert("woah", "done")
+	cMap.Put("hello", "world")
+	cMap.Put("new", "wow!")
+	cMap.Put("again", "test!")
+	cMap.Put("woah", "random entry")
+	cMap.Put("key", "Saturday!")
+	cMap.Put("sup", "6")
+	cMap.Put("final", "the!")
+	cMap.Put("6", "wow!")
+	cMap.Put("asdfasdf", "add 10")
+	cMap.Put("asdfasdf", "123123") // note same key, will update value
+	cMap.Put("asd", "queue!")
+	cMap.Put("fasdf", "interesting")
+	cMap.Put("yup", "random again!")
+	cMap.Put("asdf", "hello")
+	cMap.Put("asdffasd", "uh oh!")
+	cMap.Put("fasdfasdfasdfasdf", "error message")
+	cMap.Put("fasdfasdf", "info!")
+	cMap.Put("woah", "done")
 
 	rootBitMap := (*cmap.CMapNode[string, uint64])(atomic.LoadPointer(&cMap.Root)).BitMap
 
@@ -132,28 +132,28 @@ func TestMapOperations64(t *testing.T) {
 
 	t.Log("retrieve values")
 
-	val1 := cMap.Retrieve("hello")
+	val1 := cMap.Get("hello")
 	expVal1 :=  "world"
 	t.Logf("actual: %s, expected: %s", val1, expVal1)
 	if val1 != expVal1 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val1, expVal1)
 	}
 
-	val2 := cMap.Retrieve("new")
+	val2 := cMap.Get("new")
 	expVal2 :=  "wow!"
 	t.Logf("actual: %s, expected: %s", val2, expVal2)
 	if val2 != expVal2 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val2, expVal2)
 	}
 
-	val3 := cMap.Retrieve("asdf")
+	val3 := cMap.Get("asdf")
 	expVal3 := "hello"
 	t.Logf("actual: %s, expected: %s", val3, expVal3)
 	if val3 != expVal3 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val3, expVal3)
 	}
 
-	val4 := cMap.Retrieve("asdfasdf")
+	val4 := cMap.Get("asdfasdf")
 	expVal4 := "123123"
 	t.Logf("actual: %s, expected: %s", val4, expVal4)
 	if val4 != expVal4 {

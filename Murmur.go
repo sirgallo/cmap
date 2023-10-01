@@ -127,30 +127,30 @@ func handleRemainingBytes64(hash *uint64, dataAsBytes []byte) {
 		var chunk uint64
 
 		switch len(remaining) {
-		case 7:
-			chunk |= uint64(remaining[6]) << 48
-			fallthrough
-		case 6:
-			chunk |= uint64(remaining[5]) << 40
-			fallthrough
-		case 5:
-			chunk |= uint64(remaining[4]) << 32
-			fallthrough
-		case 4:
-			chunk |= uint64(remaining[3]) << 24
-			fallthrough
-		case 3:
-			chunk |= uint64(remaining[2]) << 16
-			fallthrough
-		case 2:
-			chunk |= uint64(remaining[1]) << 8
-			fallthrough
-		case 1:
-			chunk |= uint64(remaining[0])
-			chunk *= c64_1
-			chunk = (chunk << 31) | (chunk >> 33) // Rotate right by 31
-			chunk *= c64_2
-			*hash ^= chunk
+			case 7:
+				chunk |= uint64(remaining[6]) << 48
+				fallthrough
+			case 6:
+				chunk |= uint64(remaining[5]) << 40
+				fallthrough
+			case 5:
+				chunk |= uint64(remaining[4]) << 32
+				fallthrough
+			case 4:
+				chunk |= uint64(remaining[3]) << 24
+				fallthrough
+			case 3:
+				chunk |= uint64(remaining[2]) << 16
+				fallthrough
+			case 2:
+				chunk |= uint64(remaining[1]) << 8
+				fallthrough
+			case 1:
+				chunk |= uint64(remaining[0])
+				chunk *= c64_1
+				chunk = (chunk << 31) | (chunk >> 33) // Rotate right by 31
+				chunk *= c64_2
+				*hash ^= chunk
 		}
 	}
 }

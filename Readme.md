@@ -17,22 +17,22 @@ Make sure to run go mod tidy to install dependencies.
 ```go
 package main
 
-import "github.com/sirgallo/ads/pkg/map"
+import "github.com/sirgallo/cmap"
 
 func main() {
   // initialize c map
 
   // for 32 bit hash and bitmap
-  cMap := cmap.NewLFMap[string, uint32]()
+  cMap := cmap.NewCMap[string, uint32]()
 
   // for 64 bit hash and bitmap
-  cMap := cmap.NewLFMap[string, uint64]()
+  cMap := cmap.NewCMap[string, uint64]()
 
   // insert key/val pair
-  cMap.Insert("hi", "world")
+  cMap.Put("hi", "world")
 
   // retrieve value for key
-  val := cMap.Retrieve("hi")
+  val := cMap.Get("hi")
 
   // delete key/val pair
   cMap.Delete("hi")

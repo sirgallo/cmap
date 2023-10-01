@@ -35,9 +35,9 @@ func NewCMap[T comparable, V uint32 | uint64]() *CMap[T, V] {
 
 func (cMap *CMap[T, V]) NewLeafNode(key string, value T) *CMapNode[T, V] {
 	return &CMapNode[T, V]{
+		IsLeafNode: true,
 		Key:        key,
 		Value:      value,
-		IsLeafNode: true,
 	}
 }
 
@@ -63,14 +63,14 @@ func (cMap *CMap[T, V]) CopyNode(node *CMapNode[T, V]) *CMapNode[T, V] {
 	return nodeCopy
 }
 
-func (cMap *CMap[T, V]) Insert(key string, value T) bool {
+func (cMap *CMap[T, V]) Put(key string, value T) bool {
 	for {
-		completed := cMap.insertRecursive(&cMap.Root, key, value, 0)
+		completed := cMap.putRecursive(&cMap.Root, key, value, 0)
 		if completed { return true }
 	}
 }
 
-func (cMap *CMap[T, V]) insertRecursive(node *unsafe.Pointer, key string, value T, level int) bool {
+func (cMap *CMap[T, V]) putRecursive(node *unsafe.Pointer, key string, value T, level int) bool {
 	hash := cMap.CalculateHashForCurrentLevel(key, level)
 	index := cMap.getSparseIndex(hash, level)
 
@@ -96,15 +96,15 @@ func (cMap *CMap[T, V]) insertRecursive(node *unsafe.Pointer, key string, value 
 				newINode := cMap.NewInternalNode()
 				iNodePtr := unsafe.Pointer(newINode)
 
-				cMap.insertRecursive(&iNodePtr, childNode.Key, childNode.Value, level+1)
-				cMap.insertRecursive(&iNodePtr, key, value, level+1)
+				cMap.putRecursive(&iNodePtr, childNode.Key, childNode.Value, level+1)
+				cMap.putRecursive(&iNodePtr, key, value, level+1)
 
 				nodeCopy.Children[pos] = (*CMapNode[T, V])(atomic.LoadPointer(&iNodePtr))
 				return cMap.compareAndSwap(node, currNode, nodeCopy)
 			}
 		} else {
 			childPtr := unsafe.Pointer(nodeCopy.Children[pos])
-			cMap.insertRecursive(&childPtr, key, value, level+1)
+			cMap.putRecursive(&childPtr, key, value, level + 1)
 
 			nodeCopy.Children[pos] = (*CMapNode[T, V])(atomic.LoadPointer(&childPtr))
 			return cMap.compareAndSwap(node, currNode, nodeCopy)
@@ -112,11 +112,11 @@ func (cMap *CMap[T, V]) insertRecursive(node *unsafe.Pointer, key string, value 
 	}
 }
 
-func (cMap *CMap[T, V]) Retrieve(key string) T {
-	return cMap.retrieveRecursive(&cMap.Root, key, 0)
+func (cMap *CMap[T, V]) Get(key string) T {
+	return cMap.getRecursive(&cMap.Root, key, 0)
 }
 
-func (cMap *CMap[T, V]) retrieveRecursive(node *unsafe.Pointer, key string, level int) T {
+func (cMap *CMap[T, V]) getRecursive(node *unsafe.Pointer, key string, level int) T {
 	hash := cMap.CalculateHashForCurrentLevel(key, level)
 	index := cMap.getSparseIndex(hash, level)
 	currNode := (*CMapNode[T, V])(atomic.LoadPointer(node))
@@ -133,7 +133,7 @@ func (cMap *CMap[T, V]) retrieveRecursive(node *unsafe.Pointer, key string, leve
 			} else { return utils.GetZero[T]() }
 		} else {
 			childPtr := unsafe.Pointer(currNode.Children[pos])
-			return cMap.retrieveRecursive(&childPtr, key, level+1)
+			return cMap.getRecursive(&childPtr, key, level + 1)
 		}
 	}
 }
@@ -152,7 +152,7 @@ func (cMap *CMap[T, V]) deleteRecursive(node *unsafe.Pointer, key string, level 
 	currNode := (*CMapNode[T, V])(atomic.LoadPointer(node))
 	nodeCopy := cMap.CopyNode(currNode)
 
-	if !IsBitSet(nodeCopy.BitMap, index) {
+	if ! IsBitSet(nodeCopy.BitMap, index) {
 		return true
 	} else {
 		pos := cMap.getPosition(nodeCopy.BitMap, hash, level)
@@ -169,7 +169,7 @@ func (cMap *CMap[T, V]) deleteRecursive(node *unsafe.Pointer, key string, level 
 			return false
 		} else {
 			childPtr := unsafe.Pointer(nodeCopy.Children[pos])
-			cMap.deleteRecursive(&childPtr, key, level+1)
+			cMap.deleteRecursive(&childPtr, key, level + 1)
 
 			popCount := calculateHammingWeight(nodeCopy.BitMap)
 			if popCount == 0 { // if empty internal node, remove from the mapped array
