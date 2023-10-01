@@ -82,7 +82,7 @@ func ExtendTable[T comparable, V uint32 | uint64](orig []*CMapNode[T, V], bitMap
 
 	copy(newTable[:pos], orig[:pos])
 	newTable[pos] = newNode
-	copy(newTable[pos+1:], orig[pos:])
+	copy(newTable[pos + 1:], orig[pos:])
 
 	return newTable
 }
@@ -92,7 +92,7 @@ func ShrinkTable[T comparable, V uint32 | uint64](orig []*CMapNode[T, V], bitMap
 	newTable := make([]*CMapNode[T, V], tableSize)
 
 	copy(newTable[:pos], orig[:pos])
-	copy(newTable[pos:], orig[pos+1:])
+	copy(newTable[pos:], orig[pos + 1:])
 
 	return newTable
 }
