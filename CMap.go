@@ -69,8 +69,8 @@ func (cMap *CMap[T]) NewInternalNode() *CMapNode[T] {
 
 // CopyNode 
 //	Creates a copy of an existing node. 
-//  This is used for path copying, so on operations that modify the trie, a copy is created instead of modifying the existing node. 
-//  The data structure is essentially immutable. If an operation succeeds, the copy replaces the existing node, otherwise the copy is discarded.
+//	This is used for path copying, so on operations that modify the trie, a copy is created instead of modifying the existing node. 
+//	The data structure is essentially immutable. If an operation succeeds, the copy replaces the existing node, otherwise the copy is discarded.
 //
 // Parameters:
 //	node: the existing node to create a copy of
@@ -104,17 +104,16 @@ func (cMap *CMap[T]) CopyNode(node *CMapNode[T]) *CMapNode[T] {
 //	truthy on successful completion
 func (cMap *CMap[T]) Put(key []byte, value []byte) bool {
 	for {
-		completed := cMap.putRecursive(&cMap.Root, key, value, 0)
+		completed := cMap.PutRecursive(&cMap.Root, key, value, 0)
 		if completed { return true }
 	}
 }
 
-// putRecursive
+// PutRecursive
 //	Attempts to traverse through the trie, locating the node at a given level to modify for the key-value pair. 
 //	It first hashes the key, determines the sparse index in the bitmap to modify, and createsa copy of the current node to be modified. 
-//	If the bit in the bitmap of the node is not set, a new leaf node is created, the bitmap of the copy is modified to reflect the position of the 
-//	new leaf node, and the child node array is extended to include the new leaf node. 
-// 	Then, an atomic compare and swap operation is performed where the operation attempts to replace the current node with the modified copy. 
+//	If the bit in the bitmap of the node is not set, a new leaf node is created, the bitmap of the copy is modified to reflect the position of the new leaf node, and the child node array is extended to include the new leaf node. 
+//	Then, an atomic compare and swap operation is performed where the operation attempts to replace the current node with the modified copy. 
 //	If the operation succeeds the response is returned by moving back up the tree. If it fails, the copy is discarded and the operation returns to the root to be reattempted. 
 //	If the current bit is set in the bitmap, the operation checks if the node at the location in the child node array is a leaf node or an internal node. 
 //	If it is a leaf node and the key is the same as the incoming key, the copy is modified with the new value and we attempt to compare and swap the current child leaf node with the new copy. 
@@ -130,7 +129,7 @@ func (cMap *CMap[T]) Put(key []byte, value []byte) bool {
 //
 // Returns:
 //	truthy value from successful or failed compare and swap operations
-func (cMap *CMap[T]) putRecursive(node *unsafe.Pointer, key []byte, value []byte, level int) bool {
+func (cMap *CMap[T]) PutRecursive(node *unsafe.Pointer, key []byte, value []byte, level int) bool {
 	hash := cMap.CalculateHashForCurrentLevel(key, level)
 	index := cMap.getSparseIndex(hash, level)
 
@@ -156,15 +155,15 @@ func (cMap *CMap[T]) putRecursive(node *unsafe.Pointer, key []byte, value []byte
 				newINode := cMap.NewInternalNode()
 				iNodePtr := unsafe.Pointer(newINode)
 
-				cMap.putRecursive(&iNodePtr, []byte(childNode.Key), childNode.Value, level + 1)
-				cMap.putRecursive(&iNodePtr, key, value, level + 1)
+				cMap.PutRecursive(&iNodePtr, []byte(childNode.Key), childNode.Value, level + 1)
+				cMap.PutRecursive(&iNodePtr, key, value, level + 1)
 
 				nodeCopy.Children[pos] = (*CMapNode[T])(atomic.LoadPointer(&iNodePtr))
 				return cMap.compareAndSwap(node, currNode, nodeCopy)
 			}
 		} else {
 			childPtr := unsafe.Pointer(nodeCopy.Children[pos])
-			cMap.putRecursive(&childPtr, key, value, level + 1)
+			cMap.PutRecursive(&childPtr, key, value, level + 1)
 
 			nodeCopy.Children[pos] = (*CMapNode[T])(atomic.LoadPointer(&childPtr))
 			return cMap.compareAndSwap(node, currNode, nodeCopy)
@@ -179,10 +178,10 @@ func (cMap *CMap[T]) putRecursive(node *unsafe.Pointer, key []byte, value []byte
 // Returns:
 //	either the value for the key in byte array representation or nil if the key does not exist
 func (cMap *CMap[T]) Get(key []byte) []byte {
-	return cMap.getRecursive(&cMap.Root, key, 0)
+	return cMap.GetRecursive(&cMap.Root, key, 0)
 }
 
-// getRecursive 
+// GetRecursive 
 //	Attempts to recursively retrieve a value for a given key within the hash array mapped trie. 
 //	For each node traversed to at each level the operation travels to, the sparse index is calculated for the hashed key. 
 //	If the bit is not set in the bitmap, return nil since the key has not been inserted yet into the trie. 
@@ -198,7 +197,7 @@ func (cMap *CMap[T]) Get(key []byte) []byte {
 //
 // Returns:
 //	either the value for the given key or nil if non-existent or if the node is being modified
-func (cMap *CMap[T]) getRecursive(node *unsafe.Pointer, key []byte, level int) []byte {
+func (cMap *CMap[T]) GetRecursive(node *unsafe.Pointer, key []byte, level int) []byte {
 	hash := cMap.CalculateHashForCurrentLevel(key, level)
 	index := cMap.getSparseIndex(hash, level)
 	currNode := (*CMapNode[T])(atomic.LoadPointer(node))
@@ -213,7 +212,7 @@ func (cMap *CMap[T]) getRecursive(node *unsafe.Pointer, key []byte, level int) [
 			return childNode.Value
 		} else {
 			childPtr := unsafe.Pointer(currNode.Children[pos])
-			return cMap.getRecursive(&childPtr, key, level + 1)
+			return cMap.GetRecursive(&childPtr, key, level + 1)
 		}
 	}
 }
@@ -229,12 +228,12 @@ func (cMap *CMap[T]) getRecursive(node *unsafe.Pointer, key []byte, level int) [
 //	truthy on successful completion
 func (cMap *CMap[T]) Delete(key []byte) bool {
 	for {
-		completed := cMap.deleteRecursive(&cMap.Root, key, 0)
+		completed := cMap.DeleteRecursive(&cMap.Root, key, 0)
 		if completed { return true }
 	}
 }
 
-// deleteRecursive 
+// DeleteRecursive 
 //	Attempts to recursively move down the path of the trie to the key-value pair to be deleted. 
 //	The hash for the key is calculated, the sparse index in the bitmap is determined for the given level, and a copy of the current node is created to be modifed. 
 //	If the bit in the bitmap is not set, the key doesn't exist so truthy is returned since there is nothing to delete and the operation completes. 
@@ -252,7 +251,7 @@ func (cMap *CMap[T]) Delete(key []byte) bool {
 // 
 // Returns:
 //	truthy response on success and falsey on failure
-func (cMap *CMap[T]) deleteRecursive(node *unsafe.Pointer, key []byte, level int) bool {
+func (cMap *CMap[T]) DeleteRecursive(node *unsafe.Pointer, key []byte, level int) bool {
 	hash := cMap.CalculateHashForCurrentLevel(key, level)
 	index := cMap.getSparseIndex(hash, level)
 
@@ -276,10 +275,10 @@ func (cMap *CMap[T]) deleteRecursive(node *unsafe.Pointer, key []byte, level int
 			return false
 		} else {
 			childPtr := unsafe.Pointer(nodeCopy.Children[pos])
-			cMap.deleteRecursive(&childPtr, key, level + 1)
+			cMap.DeleteRecursive(&childPtr, key, level + 1)
 
 			popCount := calculateHammingWeight(nodeCopy.Bitmap)
-			if popCount == 0 { // if empty internal node, remove from the mapped array
+			if popCount == 0 {
 				nodeCopy.Bitmap = SetBit(nodeCopy.Bitmap, index)
 				nodeCopy.Children = ShrinkTable(nodeCopy.Children, nodeCopy.Bitmap, pos)
 			}
