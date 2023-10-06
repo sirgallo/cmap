@@ -1,7 +1,7 @@
 package cmaptests
 
+import "bytes"
 import "crypto/rand"
-import "encoding/base64"
 import "sync"
 import "testing"
 
@@ -9,22 +9,22 @@ import "github.com/sirgallo/cmap"
 
 
 type KeyVal struct {
-	Key string
-	Value string
+	Key []byte
+	Value []byte
 }
 
 
 //=================================== 32 bit
 
 func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[uint32]()
 
 	inputSize := 100000
 	keyValPairs := make([]KeyVal, inputSize)
 
 	for idx := range keyValPairs {
-		randomString, _ := GenerateRandomStringCrypto(32)
-		keyValPairs[idx] = KeyVal{ Key: randomString, Value: randomString }
+		randomBytes, _ := GenerateRandomBytes(32)
+		keyValPairs[idx] = KeyVal{ Key: randomBytes, Value: randomBytes }
 	}
 
 	t.Log("seeded keyValPairs array:", inputSize)
@@ -53,7 +53,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 
 			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
-			if value != val.Value {
+			if ! bytes.Equal(value, val.Value) {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
 			}
 		}(val)
@@ -65,7 +65,7 @@ func TestMapRandomSmallConcurrentOperations32(t *testing.T) {
 }
 
 func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[uint32]()
 
 	inputSize := 10000000
 
@@ -79,8 +79,8 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 		go func () {
 			defer fillArrWG.Done()
 
-			randomString, _ := GenerateRandomStringCrypto(32)
-			keyValChan <- KeyVal{ Key: randomString, Value: randomString }
+			randomBytes, _ := GenerateRandomBytes(32)
+			keyValChan <- KeyVal{ Key: randomBytes, Value: randomBytes }
 		}()
 	}
 
@@ -118,7 +118,7 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 
 			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
-			if value != val.Value {
+			if ! bytes.Equal(value, val.Value) {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
 			}
 		}(val)
@@ -133,14 +133,14 @@ func TestMapRandomLargeConcurrentOperations32(t *testing.T) {
 //=================================== 64 bit
 
 func TestMapRandomSmallConcurrentOperations64(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint64]()
+	cMap := cmap.NewCMap[uint64]()
 
 	inputSize := 100000
 	keyValPairs := make([]KeyVal, inputSize)
 
 	for idx := range keyValPairs {
-		randomString, _ := GenerateRandomStringCrypto(32)
-		keyValPairs[idx] = KeyVal{ Key: randomString, Value: randomString }
+		randomBytes, _ := GenerateRandomBytes(32)
+		keyValPairs[idx] = KeyVal{ Key: randomBytes, Value: randomBytes }
 	}
 
 	t.Log("seeded keyValPairs array:", inputSize)
@@ -169,7 +169,7 @@ func TestMapRandomSmallConcurrentOperations64(t *testing.T) {
 
 			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
-			if value != val.Value {
+			if ! bytes.Equal(value, val.Value) {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
 			}
 		}(val)
@@ -181,7 +181,7 @@ func TestMapRandomSmallConcurrentOperations64(t *testing.T) {
 }
 
 func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint64]()
+	cMap := cmap.NewCMap[uint64]()
 
 	inputSize := 10000000
 
@@ -195,8 +195,8 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 		go func () {
 			defer fillArrWG.Done()
 
-			randomString, _ := GenerateRandomStringCrypto(32)
-			keyValChan <- KeyVal{ Key: randomString, Value: randomString }
+			randomBytes, _ := GenerateRandomBytes(32)
+			keyValChan <- KeyVal{ Key: randomBytes, Value: randomBytes }
 		}()
 	}
 
@@ -218,7 +218,7 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 		go func (val KeyVal) {
 			defer insertWG.Done()
 			
-			cMap.Put(val.Key, val.Value)
+			cMap.Put(val.Key, []byte(val.Value))
 		}(val)
 	}
 
@@ -234,7 +234,7 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 
 			value := cMap.Get(val.Key)
 			// t.Logf("actual: %s, expected: %s", value, val.Value)
-			if value != val.Value {
+			if ! bytes.Equal(value, val.Value) {
 				t.Errorf("actual value not equal to expected: actual(%s), expected(%s)", value, val.Value)
 			}
 		}(val)
@@ -248,14 +248,13 @@ func TestMapRandomLargeConcurrentOperations64(t *testing.T) {
 
 //=================================== helper
 
-func GenerateRandomStringCrypto(length int) (string, error) {
+func GenerateRandomBytes(length int) ([]byte, error) {
 	randomBytes := make([]byte, length)
 
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	randomString := base64.RawURLEncoding.EncodeToString(randomBytes)
-	return randomString[:length], nil
+	return randomBytes, nil
 }

@@ -20,22 +20,21 @@ const (
 
 //=================================== 32 bit
 
-func Murmur32(data string, seed uint32) uint32 {
-	dataAsBytes := []byte(data)
+func Murmur32(data []byte, seed uint32) uint32 {
 	hash := seed
 	
-	length := uint32(len(dataAsBytes))
-	total4ByteChunks := len(dataAsBytes) / 4
+	length := uint32(len(data))
+	total4ByteChunks := len(data) / 4
 	
 	for idx := range make([]int, total4ByteChunks) {
 		startIdxOfChunk := idx * 4 
 		endIdxOfChunk := (idx + 1) * 4
-		chunk := binary.LittleEndian.Uint32(dataAsBytes[startIdxOfChunk:endIdxOfChunk])
+		chunk := binary.LittleEndian.Uint32(data[startIdxOfChunk:endIdxOfChunk])
 
 		rotateRight32(&hash, chunk)
 	}
 
-	handleRemainingBytes32(&hash, dataAsBytes)
+	handleRemainingBytes32(&hash, data)
 
 	hash ^= length
 	hash ^= hash >> 16
@@ -83,22 +82,21 @@ func handleRemainingBytes32(hash *uint32, dataAsBytes []byte) {
 
 //=================================== 64 bit
 
-func Murmur64(data string, seed uint64) uint64 {
-	dataAsBytes := []byte(data)
+func Murmur64(data []byte, seed uint64) uint64 {
 	hash := seed
 
-	length := uint64(len(dataAsBytes))
-	total8ByteChunks := len(dataAsBytes) / 8
+	length := uint64(len(data))
+	total8ByteChunks := len(data) / 8
 
 	for idx := range make([]int, total8ByteChunks) {
 		startIdxOfChunk := idx * 8
 		endIdxOfChunk := (idx + 1) * 8
-		chunk := binary.LittleEndian.Uint64(dataAsBytes[startIdxOfChunk:endIdxOfChunk])
+		chunk := binary.LittleEndian.Uint64(data[startIdxOfChunk:endIdxOfChunk])
 
 		rotateRight64(&hash, chunk)
 	}
 
-	handleRemainingBytes64(&hash, dataAsBytes)
+	handleRemainingBytes64(&hash, data)
 
 	hash ^= length
 	hash ^= hash >> 33

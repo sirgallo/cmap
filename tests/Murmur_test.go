@@ -8,7 +8,7 @@ import "github.com/sirgallo/cmap"
 //=================================== 32 bit
 
 func TestMurmur32(t *testing.T) {
-	key := "hello"
+	key := []byte("hello")
 	seed := uint32(1)
 
 	hash := cmap.Murmur32(key, seed)
@@ -16,12 +16,12 @@ func TestMurmur32(t *testing.T) {
 }
 
 func TestMurmur32ReSeed(t *testing.T) {
-	key := "hello"
+	key := []byte("hello")
 	levels := make([]int, 17)
 	totalLevels := 6
 	chunkSize := 5
 
-	cMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[uint32]()
 
 	for idx := range levels {
 		hash := cMap.CalculateHashForCurrentLevel(key, idx)
@@ -34,7 +34,7 @@ func TestMurmur32ReSeed(t *testing.T) {
 //=================================== 64 bit
 
 func TestMurmur64(t *testing.T) {
-	key := "hello"
+	key := []byte("hello")
 	seed := uint64(1)
 
 	hash := cmap.Murmur64(key, seed)
@@ -42,12 +42,12 @@ func TestMurmur64(t *testing.T) {
 }
 
 func TestMurmur64ReSeed(t *testing.T) {
-	key := "hello"
+	key := []byte("hello")
 	levels := make([]int, 33)
 	totalLevels := 10
 	chunkSize := 6
 
-	cMap := cmap.NewCMap[string, uint64]()
+	cMap := cmap.NewCMap[uint64]()
 
 	for idx := range levels {
 		hash := cMap.CalculateHashForCurrentLevel(key, idx)

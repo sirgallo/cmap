@@ -9,28 +9,28 @@ import "github.com/sirgallo/cmap"
 //=================================== 32 bit
 
 func TestMapOperations32(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint32]()
+	cMap := cmap.NewCMap[uint32]()
 
-	cMap.Put("hello", "world")
-	cMap.Put("new", "wow!")
-	cMap.Put("again", "test!")
-	cMap.Put("woah", "random entry")
-	cMap.Put("key", "Saturday!")
-	cMap.Put("sup", "6")
-	cMap.Put("final", "the!")
-	cMap.Put("6", "wow!")
-	cMap.Put("asdfasdf", "add 10")
-	cMap.Put("asdfasdf", "123123") // note same key, will update value
-	cMap.Put("asd", "queue!")
-	cMap.Put("fasdf", "interesting")
-	cMap.Put("yup", "random again!")
-	cMap.Put("asdf", "hello")
-	cMap.Put("asdffasd", "uh oh!")
-	cMap.Put("fasdfasdfasdfasdf", "error message")
-	cMap.Put("fasdfasdf", "info!")
-	cMap.Put("woah", "done")
+	cMap.Put([]byte("hello"), []byte("world"))
+	cMap.Put([]byte("new"), []byte("wow!"))
+	cMap.Put([]byte("again"), []byte("test!"))
+	cMap.Put([]byte("woah"), []byte("random entry"))
+	cMap.Put([]byte("key"), []byte("Saturday!"))
+	cMap.Put([]byte("sup"), []byte("6"))
+	cMap.Put([]byte("final"), []byte("the!"))
+	cMap.Put([]byte("6"), []byte("wow!"))
+	cMap.Put([]byte("asdfasdf"), []byte("add 10"))
+	cMap.Put([]byte("asdfasdf"), []byte("123123")) // note same key, will update value
+	cMap.Put([]byte("asd"), []byte("queue!"))
+	cMap.Put([]byte("fasdf"), []byte("interesting"))
+	cMap.Put([]byte("yup"), []byte("random again!"))
+	cMap.Put([]byte("asdf"), []byte("hello"))
+	cMap.Put([]byte("asdffasd"), []byte("uh oh!"))
+	cMap.Put([]byte("fasdfasdfasdfasdf"), []byte("error message"))
+	cMap.Put([]byte("fasdfasdf"), []byte("info!"))
+	cMap.Put([]byte("woah"), []byte("done"))
 
-	rootBitMap := (*cmap.CMapNode[string, uint32])(atomic.LoadPointer(&cMap.Root)).BitMap
+	rootBitMap := (*cmap.CMapNode[uint32])(atomic.LoadPointer(&cMap.Root)).Bitmap
 
 	t.Logf("cMap after inserts")
 	cMap.PrintChildren()
@@ -44,42 +44,42 @@ func TestMapOperations32(t *testing.T) {
 
 	t.Log("retrieve values")
 
-	val1 := cMap.Get("hello")
+	val1 := cMap.Get([]byte("hello"))
 	expVal1 :=  "world"
 	t.Logf("actual: %s, expected: %s", val1, expVal1)
-	if val1 != expVal1 {
+	if string(val1) != expVal1 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val1, expVal1)
 	}
 
-	val2 := cMap.Get("new")
+	val2 := cMap.Get([]byte("new"))
 	expVal2 :=  "wow!"
 	t.Logf("actual: %s, expected: %s", val2, expVal2)
-	if val2 != expVal2 {
+	if string(val2) != expVal2 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val2, expVal2)
 	}
 
-	val3 := cMap.Get("asdf")
+	val3 := cMap.Get([]byte("asdf"))
 	expVal3 := "hello"
 	t.Logf("actual: %s, expected: %s", val3, expVal3)
-	if val3 != expVal3 {
+	if string(val3) != expVal3 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val3, expVal3)
 	}
 
-	val4 := cMap.Get("asdfasdf")
+	val4 := cMap.Get([]byte("asdfasdf"))
 	expVal4 := "123123"
 	t.Logf("actual: %s, expected: %s", val4, expVal4)
-	if val4 != expVal4 {
+	if string(val4) != expVal4 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val4, expVal4)
 	}
 
-	cMap.Delete("hello")
-	cMap.Delete("yup")
-	cMap.Delete("asdf")
-	cMap.Delete("asdfasdf")
-	cMap.Delete("new")
-	cMap.Delete("6")
+	cMap.Delete([]byte("hello"))
+	cMap.Delete([]byte("yup"))
+	cMap.Delete([]byte("asdf"))
+	cMap.Delete([]byte("asdfasdf"))
+	cMap.Delete([]byte("new"))
+	cMap.Delete([]byte("6"))
 
-	rootBitMapAfterDelete := (*cmap.CMapNode[string, uint32])(atomic.LoadPointer(&cMap.Root)).BitMap
+	rootBitMapAfterDelete := (*cmap.CMapNode[uint32])(atomic.LoadPointer(&cMap.Root)).Bitmap
 	t.Logf("bitmap of root after deletes: %032b\n", rootBitMapAfterDelete)
 	t.Logf("bitmap of root after deletes: %d\n", rootBitMapAfterDelete)
 
@@ -97,28 +97,28 @@ func TestMapOperations32(t *testing.T) {
 //=================================== 64 bit
 
 func TestMapOperations64(t *testing.T) {
-	cMap := cmap.NewCMap[string, uint64]()
+	cMap := cmap.NewCMap[uint64]()
 
-	cMap.Put("hello", "world")
-	cMap.Put("new", "wow!")
-	cMap.Put("again", "test!")
-	cMap.Put("woah", "random entry")
-	cMap.Put("key", "Saturday!")
-	cMap.Put("sup", "6")
-	cMap.Put("final", "the!")
-	cMap.Put("6", "wow!")
-	cMap.Put("asdfasdf", "add 10")
-	cMap.Put("asdfasdf", "123123") // note same key, will update value
-	cMap.Put("asd", "queue!")
-	cMap.Put("fasdf", "interesting")
-	cMap.Put("yup", "random again!")
-	cMap.Put("asdf", "hello")
-	cMap.Put("asdffasd", "uh oh!")
-	cMap.Put("fasdfasdfasdfasdf", "error message")
-	cMap.Put("fasdfasdf", "info!")
-	cMap.Put("woah", "done")
+	cMap.Put([]byte("hello"), []byte("world"))
+	cMap.Put([]byte("new"), []byte("wow!"))
+	cMap.Put([]byte("again"), []byte("test!"))
+	cMap.Put([]byte("woah"), []byte("random entry"))
+	cMap.Put([]byte("key"), []byte("Saturday!"))
+	cMap.Put([]byte("sup"), []byte("6"))
+	cMap.Put([]byte("final"), []byte("the!"))
+	cMap.Put([]byte("6"), []byte("wow!"))
+	cMap.Put([]byte("asdfasdf"), []byte("add 10"))
+	cMap.Put([]byte("asdfasdf"), []byte("123123")) // note same key, will update value
+	cMap.Put([]byte("asd"), []byte("queue!"))
+	cMap.Put([]byte("fasdf"), []byte("interesting"))
+	cMap.Put([]byte("yup"), []byte("random again!"))
+	cMap.Put([]byte("asdf"), []byte("hello"))
+	cMap.Put([]byte("asdffasd"), []byte("uh oh!"))
+	cMap.Put([]byte("fasdfasdfasdfasdf"), []byte("error message"))
+	cMap.Put([]byte("fasdfasdf"), []byte("info!"))
+	cMap.Put([]byte("woah"), []byte("done"))
 
-	rootBitMap := (*cmap.CMapNode[string, uint64])(atomic.LoadPointer(&cMap.Root)).BitMap
+	rootBitMap := (*cmap.CMapNode[uint64])(atomic.LoadPointer(&cMap.Root)).Bitmap
 
 	t.Logf("cMap after inserts")
 	cMap.PrintChildren()
@@ -132,42 +132,42 @@ func TestMapOperations64(t *testing.T) {
 
 	t.Log("retrieve values")
 
-	val1 := cMap.Get("hello")
+	val1 := cMap.Get([]byte("hello"))
 	expVal1 :=  "world"
 	t.Logf("actual: %s, expected: %s", val1, expVal1)
-	if val1 != expVal1 {
+	if string(val1) != expVal1 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val1, expVal1)
 	}
 
-	val2 := cMap.Get("new")
+	val2 := cMap.Get([]byte("new"))
 	expVal2 :=  "wow!"
 	t.Logf("actual: %s, expected: %s", val2, expVal2)
-	if val2 != expVal2 {
+	if string(val2) != expVal2 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)\n", val2, expVal2)
 	}
 
-	val3 := cMap.Get("asdf")
+	val3 := cMap.Get([]byte("asdf"))
 	expVal3 := "hello"
 	t.Logf("actual: %s, expected: %s", val3, expVal3)
-	if val3 != expVal3 {
+	if string(val3) != expVal3 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val3, expVal3)
 	}
 
-	val4 := cMap.Get("asdfasdf")
+	val4 := cMap.Get([]byte("asdfasdf"))
 	expVal4 := "123123"
 	t.Logf("actual: %s, expected: %s", val4, expVal4)
-	if val4 != expVal4 {
+	if string(val4) != expVal4 {
 		t.Errorf("val 1 does not match expected val 1: actual(%s), expected(%s)", val4, expVal4)
 	}
 
-	cMap.Delete("hello")
-	cMap.Delete("yup")
-	cMap.Delete("asdf")
-	cMap.Delete("asdfasdf")
-	cMap.Delete("new")
-	cMap.Delete("6")
+	cMap.Delete([]byte("hello"))
+	cMap.Delete([]byte("yup"))
+	cMap.Delete([]byte("asdf"))
+	cMap.Delete([]byte("asdfasdf"))
+	cMap.Delete([]byte("new"))
+	cMap.Delete([]byte("6"))
 
-	rootBitMapAfterDelete := (*cmap.CMapNode[string, uint64])(atomic.LoadPointer(&cMap.Root)).BitMap
+	rootBitMapAfterDelete := (*cmap.CMapNode[uint64])(atomic.LoadPointer(&cMap.Root)).Bitmap
 	t.Logf("bitmap of root after deletes: %032b\n", rootBitMapAfterDelete)
 	t.Logf("bitmap of root after deletes: %d\n", rootBitMapAfterDelete)
 

@@ -12,7 +12,7 @@ func TestGetIndex32(t *testing.T) {
 	chunkSize := 5
 	seed := uint32(1)
 
-	key1 := "hello"
+	key1 := []byte("hello")
 	hash1 := cmap.Murmur32(key1, seed)
 
 	fmt.Printf("hash 1: %032b\n:", hash1)
@@ -27,7 +27,7 @@ func TestGetIndex32(t *testing.T) {
 		}
 	}
 
-	key2 := "new"
+	key2 := []byte("new")
 	hash2 := cmap.Murmur32(key2, seed)
 
 	fmt.Printf("hash 2: %032b\n:", hash2)
@@ -122,7 +122,7 @@ func TestGetIndex64(t *testing.T) {
 	chunkSize := 6
 	seed := uint64(1)
 
-	key1 := "hello"
+	key1 := []byte("hello")
 	hash1 := cmap.Murmur64(key1, seed)
 
 	fmt.Printf("hash 1: %032b\n:", hash1)
@@ -137,7 +137,7 @@ func TestGetIndex64(t *testing.T) {
 		}
 	}
 
-	key2 := "new"
+	key2 := []byte("new")
 	hash2 := cmap.Murmur64(key2, seed)
 
 	fmt.Printf("hash 2: %032b\n:", hash2)

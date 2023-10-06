@@ -11,10 +11,10 @@ Both the `32 bit` and `64 bit` variants have been implemented, with instantiatio
 
 ```go
 // 32 bit
-cMap := cmap.NewCMap[T, uint32]()
+cMap := cmap.NewCMap[uint32]()
 
 // 64 bit
-cMap := cmap.NewCMap[T, uint64]()
+cMap := cmap.NewCMap[uint64]()
 ```
 
 
@@ -98,7 +98,7 @@ Each node contains a sparse index for the mapped nodes in a uint32 bit map.
 
 To calculate the index:
 ```go
-func GetIndex[V uint32 | uint64](hash V, chunkSize int, level int) int {
+func GetIndex[T uint32 | uint64](hash T, chunkSize int, level int) int {
 	slots := int(math.Pow(float64(2), float64(chunkSize)))
 	shiftSize := slots - (chunkSize * (level + 1))
 
@@ -122,7 +122,7 @@ To limit table size and create dynamically sized tables to limit memory usage (i
 
 In go, we can utilize the `math/bits` package to calculate the hamming weight efficiently:
 ```go
-func calculateHammingWeight[V uint32 | uint64](bitmap V) int {
+func calculateHammingWeight[T uint32 | uint64](bitmap T) int {
 	switch any(bitmap).(type) {
 		case uint64:
 			return bits.OnesCount64((uint64)(bitmap))
@@ -146,9 +146,9 @@ hammingWeight(uint32 bits):
 
 to calculate position:
 ```go
-func (lfMap *CMap[T, V]) getPosition(bitMap V, hash V, level int) int {
-	sparseIdx := GetIndexForLevel(hash, lfMap.BitChunkSize, level, lfMap.HashChunks)
-	
+func (cMap *CMap[T]) getPosition(bitMap T, hash T, level int) int {
+	sparseIdx := GetIndexForLevel(hash, cMap.BitChunkSize, level, cMap.HashChunks)
+
 	switch any(bitMap).(type) {
 		case uint64:
 			mask := uint64((1 << sparseIdx) - 1)
@@ -173,14 +173,14 @@ func (lfMap *CMap[T, V]) getPosition(bitMap V, hash V, level int) int {
 When a position in the new table is calculated for an inserted element, the original table needs to be resized, and a new row at that particular location will be added, maintaining the sorted nature from the sparse index. This is done using go array slices, and copying elements from the original to the new table.
 
 ```go
-func ExtendTable[T comparable, V uint32 | uint64](orig []*CMapNode[T, V], bitMap V, pos int, newNode *CMapNode[T, V]) []*CMapNode[T, V] {
+func ExtendTable[T uint32 | uint64](orig []*CMapNode[T], bitMap T, pos int, newNode *CMapNode[T]) []*CMapNode[T] {
 	tableSize := calculateHammingWeight(bitMap)
-	newTable := make([]*CMapNode[T, V], tableSize)
-	
+	newTable := make([]*CMapNode[T], tableSize)
+
 	copy(newTable[:pos], orig[:pos])
 	newTable[pos] = newNode
 	copy(newTable[pos + 1:], orig[pos:])
-	
+
 	return newTable
 }
 ```
@@ -191,10 +191,10 @@ func ExtendTable[T comparable, V uint32 | uint64](orig []*CMapNode[T, V], bitMap
 Similarly to extending, shrinking a table will remove a row at a particular index and then copy elements from the original table over to the new table.
 
 ```go
-func ShrinkTable[T comparable, V uint32 | uint64](orig []*CMapNode[T, V], bitMap V, pos int) []*CMapNode[T, V] {
+func ShrinkTable[T uint32 | uint64](orig []*CMapNode[T], bitMap T, pos int) []*CMapNode[T] {
 	tableSize := calculateHammingWeight(bitMap)
-	newTable := make([]*CMapNode[T, V], tableSize)
-	
+	newTable := make([]*CMapNode[T], tableSize)
+
 	copy(newTable[:pos], orig[:pos])
 	copy(newTable[pos:], orig[pos + 1:])
 
