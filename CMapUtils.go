@@ -7,6 +7,9 @@ import "sync/atomic"
 import "unsafe"
 
 
+//========================================= CMap Utils
+
+
 // CalculateHashForCurrentLevel 
 //	Calculates the hash for value based on what level of the trie the operation is at. 
 //	Hash is reseeded every 6 levels.

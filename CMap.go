@@ -6,6 +6,9 @@ import "sync/atomic"
 import "unsafe"
 
 
+//========================================= CMap
+
+
 // NewCMap 
 //	Initializes a new hash array mapped trie.
 //
@@ -155,7 +158,7 @@ func (cMap *CMap[T]) PutRecursive(node *unsafe.Pointer, key []byte, value []byte
 				newINode := cMap.NewInternalNode()
 				iNodePtr := unsafe.Pointer(newINode)
 
-				cMap.PutRecursive(&iNodePtr, []byte(childNode.Key), childNode.Value, level + 1)
+				cMap.PutRecursive(&iNodePtr, childNode.Key, childNode.Value, level + 1)
 				cMap.PutRecursive(&iNodePtr, key, value, level + 1)
 
 				nodeCopy.Children[pos] = (*CMapNode[T])(atomic.LoadPointer(&iNodePtr))
