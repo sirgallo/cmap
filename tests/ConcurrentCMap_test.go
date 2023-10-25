@@ -2,17 +2,10 @@ package cmaptests
 
 import "bytes"
 import "fmt"
-import "crypto/rand"
 import "sync"
 import "testing"
 
 import "github.com/sirgallo/cmap"
-
-
-type KeyVal struct {
-	Key []byte
-	Value []byte
-}
 
 
 var sKeyValPairs, lKeyValPairs []KeyVal
@@ -44,7 +37,7 @@ func init() {
 	}
 
 	fillArrWG.Wait()
-	fmt.Println("filled random key val pairs chan with size:", lInputSize)
+	fmt.Println("filled random key val pairs chan with size1:", lInputSize)
 
 	for idx := range lKeyValPairs {
 		keyVal :=<- lKeyValChan
@@ -278,18 +271,4 @@ func TestCMapLargeConcurrentOps64(t *testing.T) {
 	})
 
 	t.Log("done")
-}
-
-
-//=================================== helper
-
-func GenerateRandomBytes(length int) ([]byte, error) {
-	randomBytes := make([]byte, length)
-
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return randomBytes, nil
 }
